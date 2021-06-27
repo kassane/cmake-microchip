@@ -35,7 +35,7 @@ if(NOT MICROCHIP_XC8_CLI)
     set(_xc8_cli_default TRUE CACHE INTERNAL "" FORCE)
 endif()
 set(MICROCHIP_XC8_CLI "${MICROCHIP_XC8_CLI}"
-    CACHE STRING "the XC8 CLI driver to use ('xc8-cc', 'xc8' or 'avr-gcc')"
+    CACHE STRING "the XC8 CLI driver to use ('xc8-cc', 'xc8', 'zig cc' or 'avr-gcc')"
 )
 
 if(MICROCHIP_XC8_CLI STREQUAL "xc8-cc")
@@ -74,11 +74,28 @@ elseif(MICROCHIP_XC8_CLI STREQUAL "avr-gcc")
     set(_xc8_version_flag "--version")
     set(CMAKE_C_COMPILER_ID "AVRGCC")
     set(CMAKE_CXX_COMPILER_ID "AVRGCC")
+
+    elseif(MICROCHIP_XC8_CLI STREQUAL "zig cc")
+    find_program(CMAKE_C_COMPILER "zig cc"
+        PATHS "${MICROCHIP_XC8_PATH}"
+        # PATH_SUFFIXES "avr/bin"
+    )
+    find_program(CMAKE_CXX_COMPILER "zig cc"
+        PATHS "${MICROCHIP_XC8_PATH}"
+        # PATH_SUFFIXES "avr/bin"
+    )
+    find_program(CMAKE_AR "zig ar"
+        PATHS "${MICROCHIP_XC8_PATH}"
+        # PATH_SUFFIXES "avr/bin"
+    )
+    set(_xc8_version_flag "--version")
+    set(CMAKE_C_COMPILER_ID "CLANG")
+    set(CMAKE_CXX_COMPILER_ID "CLANG++")
     
 else()
     message(FATAL_ERROR
         "Invalid choice '${MICROCHIP_XC8_CLI}' for MICROCHIP_XC8_CLI."
-        " Please choose either 'xc8-cc' (recommended), 'xc8' or 'avr-gcc'."
+        " Please choose either 'xc8-cc' (recommended), 'xc8', 'clang' or 'avr-gcc'."
         " See docs/xc8.md in your cmake-microchip installation for"
         " details on this option."
     )
@@ -135,6 +152,9 @@ function(_xc8_get_version)
     if(output MATCHES "XC8 C Compiler V([0-9]+\.[0-9]+)")
         set(CMAKE_C_COMPILER_VERSION ${CMAKE_MATCH_1} PARENT_SCOPE)
     elseif(output MATCHES "(avr-gcc)(.*\\)) ([0-9]+.[0-9]+.[0-9]+)")
+        set(CMAKE_C_COMPILER_VERSION ${CMAKE_MATCH_3} PARENT_SCOPE)
+        set(CMAKE_CXX_COMPILER_VERSION ${CMAKE_MATCH_3} PARENT_SCOPE)
+    elseif(output MATCHES "(clang)(.*\\)) ([0-9]+.[0-9]+.[0-9]+)")
         set(CMAKE_C_COMPILER_VERSION ${CMAKE_MATCH_3} PARENT_SCOPE)
         set(CMAKE_CXX_COMPILER_VERSION ${CMAKE_MATCH_3} PARENT_SCOPE)
     else()
