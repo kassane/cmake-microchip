@@ -80,7 +80,7 @@ elseif(MICROCHIP_XC8_CLI STREQUAL "avr-gcc")
         PATHS "${MICROCHIP_XC8_PATH}"
         # PATH_SUFFIXES "avr/bin"
     )
-    find_program(CMAKE_CXX_COMPILER "zig cc"
+    find_program(CMAKE_CXX_COMPILER "zig c++"
         PATHS "${MICROCHIP_XC8_PATH}"
         # PATH_SUFFIXES "avr/bin"
     )
@@ -95,7 +95,7 @@ elseif(MICROCHIP_XC8_CLI STREQUAL "avr-gcc")
 else()
     message(FATAL_ERROR
         "Invalid choice '${MICROCHIP_XC8_CLI}' for MICROCHIP_XC8_CLI."
-        " Please choose either 'xc8-cc' (recommended), 'xc8', 'clang' or 'avr-gcc'."
+        " Please choose either 'xc8-cc' (recommended), 'xc8', 'zig cc' or 'avr-gcc'."
         " See docs/xc8.md in your cmake-microchip installation for"
         " details on this option."
     )
